@@ -1,3 +1,4 @@
+package mars;
 
 /*
 Copyright (c) 2003-2006,  Pete Sanderson and Kenneth Vollmar

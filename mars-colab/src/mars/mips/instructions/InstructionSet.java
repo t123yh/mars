@@ -2,7 +2,7 @@
    import mars.simulator.*;
    import mars.mips.hardware.*;
    import mars.mips.instructions.syscalls.*;
-   import mars.*;
+import mars.*;
    import mars.util.*;
    import java.util.*;
    import java.io.*;
@@ -3115,7 +3115,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
          try
          {
             // leading "/" prevents package name being prepended to filepath.
-            is = this.getClass().getResourceAsStream("/PseudoOps.txt");
+            is = ResourceLoader.loadResource("PseudoOps.txt");
             in = new BufferedReader(new InputStreamReader(is));
          }
              catch (NullPointerException e)

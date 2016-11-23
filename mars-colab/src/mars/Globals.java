@@ -74,7 +74,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     /* The GUI being used (if any) with this simulator. */
       static VenusUI gui = null;
     /** The current MARS version number. Can't wait for "initialize()" call to get it. */
-      public static final String version = "4.5-BUAA";
+      public static final String version = "4.5-E";
     /** List of accepted file extensions for MIPS assembly source files. */
       public static final ArrayList fileExtensions = getFileExtensions();
     /** Maximum length of scrolled message window (MARS Messages and Run I/O) */
@@ -155,23 +155,35 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
    	// Read ASCII strings for codes 0-255, from properties file. If string
 		// value is "null", substitute value of ASCII_NON_PRINT.  If string is
 		// "space", substitute string containing one space character.
-       public static String[] getAsciiStrings() {
-		   String let = getPropertyEntry(configPropertiesFile,"AsciiTable");
-		   String placeHolder = getAsciiNonPrint();
-			String[] lets = let.split(" +");
+	public static String[] getAsciiStrings() {
+		String let = getPropertyEntry(configPropertiesFile, "AsciiTable");
+		String[] lets;
+		if (let != null) {
+			String placeHolder = getAsciiNonPrint();
+			lets = let.split(" +");
 			int maxLength = 0;
 			for (int i = 0; i < lets.length; i++) {
-			    if (lets[i].equals("null")) lets[i] = placeHolder;
-				 if (lets[i].equals("space")) lets[i] = " ";
-				 if (lets[i].length() > maxLength) maxLength = lets[i].length();
+				if (lets[i].equals("null"))
+					lets[i] = placeHolder;
+				if (lets[i].equals("space"))
+					lets[i] = " ";
+				if (lets[i].length() > maxLength)
+					maxLength = lets[i].length();
 			}
 			String padding = "        ";
 			maxLength++;
 			for (int i = 0; i < lets.length; i++) {
-             lets[i] = padding.substring(0,maxLength-lets[i].length()) + lets[i];
+				lets[i] = padding.substring(0, maxLength - lets[i].length()) + lets[i];
 			}
-			return lets;
-      }
+		} else {
+			System.err.printf("Failed to load ASCII table%n");
+			lets = new String[256];
+			for (int i=0; i<lets.length; i++) {
+				lets[i] = "";
+			}
+		}
+		return lets;
+	}
 
       // Read and return integer property value for given file and property name.
    	// Default value is returned if property file or name not found.
