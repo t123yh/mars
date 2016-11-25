@@ -423,7 +423,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                									  "If set, the MIPS program can write and branch to both text and data segments.",
                									  null,null,
                									  mainUI);
-			settingsUseSystemLookAndFeelAction = new SettingsUseSystemLookAndFeelAction("使用系统皮肤", null, "", null, null, mainUI);
+			settingsUseSystemLookAndFeelAction = new SettingsUseSystemLookAndFeelAction("Use system look-and-feel", null, "", null, null, mainUI);
             settingsEditorAction          = new SettingsEditorAction("Editor...",
                                             null,
                									  "View and modify text editor settings.",

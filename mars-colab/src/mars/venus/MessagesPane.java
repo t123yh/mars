@@ -1,15 +1,20 @@
-   package mars.venus;
-   import mars.*;
-   import javax.swing.*;
-   import javax.swing.text.*;
-   import java.awt.*;
-   import java.awt.event.*;
-   import java.util.concurrent.ArrayBlockingQueue;
-   import javax.swing.event.DocumentListener;
-   import javax.swing.undo.UndoableEdit;
-   import mars.simulator.Simulator;
-   import javax.swing.event.DocumentEvent;
-   import javax.swing.text.Position.Bias;
+package mars.venus;
+
+import mars.*;
+import mars.Globals;
+
+import javax.swing.*;
+import javax.swing.text.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import javax.swing.event.DocumentListener;
+import javax.swing.undo.UndoableEdit;
+import mars.simulator.Simulator;
+import javax.swing.event.DocumentEvent;
+import javax.swing.text.Position.Bias;
+import org.luaj.vm2.*;
+import org.luaj.vm2.lib.jse.*;
 
 /*
 Copyright (c) 2003-2010,  Pete Sanderson and Kenneth Vollmar
@@ -45,8 +50,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   **/
 
     public class MessagesPane extends JTabbedPane{
-      JTextArea assemble, run;
-      JPanel assembleTab, runTab;
+      JTextArea assemble, run, luaTextArea;
+      JPanel assembleTab, runTab, luaTab; // hsh: add Lua Console tab
    	// These constants are designed to keep scrolled contents of the
    	// two message areas from becoming overwhelmingly large (which
    	// seems to slow things down as new text is appended).  Once it
@@ -74,6 +79,9 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
          Font monoFont = new Font(Font.MONOSPACED, Font.PLAIN, 12);
          assemble.setFont(monoFont);
          run.setFont(monoFont);
+         
+         luaTextArea = new JTextArea();
+         luaTextArea.setFont(monoFont);
 
          JButton assembleTabClearButton = new JButton("Clear");
          assembleTabClearButton.setToolTipText("Clear the Mars Messages area");
@@ -165,8 +173,24 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
          runTab.add(createBoxForButton(runTabClearButton),BorderLayout.WEST);
          runTab.add(new JScrollPane(run, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED), BorderLayout.CENTER);
+		// initialize Lua tab
+		JButton luaTabRunButton = new JButton("Run");
+		luaTabRunButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				org.luaj.vm2.Globals globals = JsePlatform.standardGlobals();
+				globals.load(new mars.lua.LuaBinding());
+				LuaValue chunk = globals.load(luaTextArea.getText());
+				chunk.call();
+			}
+		});
+		luaTab = new JPanel(new BorderLayout());
+		luaTab.add(createBoxForButton(luaTabRunButton), BorderLayout.WEST);
+		luaTab.add(new JScrollPane(luaTextArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED), BorderLayout.CENTER);
          this.addTab("Mars Messages", assembleTab);
          this.addTab("Run I/O", runTab);
+         this.addTab("Lua Console", luaTab);
          this.setToolTipTextAt(0,"Messages produced by Run menu. Click on assemble error message to select erroneous line");
          this.setToolTipTextAt(1,"Simulated MIPS console input and output");
       }
@@ -377,7 +401,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
    	  ////////////////////////////////////////////////////////////////////////////
    	  // Thread class for obtaining user input in the Run I/O window (MessagesPane)
-   	  // Written by Ricardo Fernández Pascual [rfernandez@ditec.um.es] December 2009.
+   	  // Written by Ricardo Fernï¿½ndez Pascual [rfernandez@ditec.um.es] December 2009.
        class Asker implements Runnable {
          ArrayBlockingQueue<String> resultQueue = new ArrayBlockingQueue<String>(1);
          int initialPos;
