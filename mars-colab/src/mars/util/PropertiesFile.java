@@ -57,7 +57,7 @@ public class PropertiesFile {
 		Properties properties = new Properties();
 		String resourcePath = file + ".properties";
 		try {
-			InputStream is = ResourceLoader.loadResource(resourcePath);
+			InputStream is = mars.resource.ResourceLoader.loadResource(resourcePath);
 			if (is == null) {
 				System.err.printf("Resource not found: %s%n", resourcePath);
 			}

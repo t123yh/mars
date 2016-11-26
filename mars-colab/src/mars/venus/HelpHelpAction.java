@@ -2,7 +2,6 @@
    import mars.*;
    import mars.assembler.*;
    import mars.mips.instructions.*;
-import mars.util.ResourceLoader;
 
 import java.util.*;
    import java.io.*;
@@ -151,7 +150,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
          JScrollPane marsCopyrightScrollPane;
          JEditorPane marsCopyrightDisplay;
          try {
-            InputStream is = ResourceLoader.loadResource("MARSlicense.txt");
+            InputStream is = mars.resource.ResourceLoader.loadResource("MARSlicense.txt");
             BufferedReader in = new BufferedReader(new InputStreamReader(is));
             String line;
             StringBuffer text = new StringBuffer("<pre>");

@@ -76,6 +76,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
               settingsExtended, settingsAssembleOnOpen, settingsAssembleAll, settingsWarningsAreErrors, settingsStartAtMain,
       		  settingsDelayedBranching, settingsProgramArguments, settingsSelfModifyingCode, settingsUseSystemLookAndFeel;
       private JMenuItem settingsExceptionHandler, settingsEditor, settingsHighlighting, settingsMemoryConfiguration;
+      private JMenuItem settingsLoadInstructionSet;
       private JMenuItem helpHelp, helpAbout;
 
       // components of the toolbar
@@ -100,7 +101,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       					settingsWarningsAreErrorsAction, settingsStartAtMainAction, settingsProgramArgumentsAction,
       					settingsDelayedBranchingAction, settingsExceptionHandlerAction, settingsEditorAction,
       					settingsHighlightingAction, settingsMemoryConfigurationAction, settingsSelfModifyingCodeAction,
-      					settingsUseSystemLookAndFeelAction;
+      					settingsUseSystemLookAndFeelAction, settingsLoadInstructionSetAction;
       private Action helpHelpAction, helpAboutAction;
 
 
@@ -444,6 +445,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                									  "View and modify memory segment base addresses for simulated MIPS.",
                									  null,null,
                									  mainUI);
+            settingsLoadInstructionSetAction = new SettingsLoadInstructionSetAction("Load Instruction Set...",
+            		null, "Load custom instruction set", null, null, mainUI);
             helpHelpAction = new HelpHelpAction("Help",
                                             new ImageIcon(tk.getImage(cs.getResource(Globals.imagesPath+"Help22.png"))),
                									  "Help", new Integer(KeyEvent.VK_H),
@@ -607,6 +610,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
          settingsHighlighting = new JMenuItem(settingsHighlightingAction);
          settingsExceptionHandler = new JMenuItem(settingsExceptionHandlerAction);
          settingsMemoryConfiguration = new JMenuItem(settingsMemoryConfigurationAction);
+         settingsLoadInstructionSet = new JMenuItem(settingsLoadInstructionSetAction);
 
          settings.add(settingsLabel);
          settings.add(settingsProgramArguments);
@@ -614,7 +618,6 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
          settings.add(settingsAddressDisplayBase);
          settings.add(settingsValueDisplayBase);
          settings.add(settingsUseSystemLookAndFeel);
-         settings.addSeparator();
          settings.addSeparator();
          settings.add(settingsAssembleOnOpen);
          settings.add(settingsAssembleAll);
@@ -628,6 +631,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
          settings.add(settingsHighlighting);
          settings.add(settingsExceptionHandler);
          settings.add(settingsMemoryConfiguration);
+         settings.addSeparator();
+         settings.add(settingsLoadInstructionSet);
 
          helpHelp = new JMenuItem(helpHelpAction);
          helpHelp.setIcon(new ImageIcon(tk.getImage(cs.getResource(Globals.imagesPath+"Help16.png"))));//"Help16.gif"))));

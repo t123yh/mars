@@ -85,6 +85,9 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
    // Simply check to see if numbers of operands are correct and generate error message if not.
        private static boolean numOperandsCheck(TokenList cand, Instruction spec, ErrorList errors) {
          int numOperands = cand.size()-1;
+         if (spec == null || spec.getTokenList() == null) {
+        	 assert false;
+         }
          int reqNumOperands = spec.getTokenList().size()-1;
          Token operator = cand.get(0);
          if (numOperands == reqNumOperands) {

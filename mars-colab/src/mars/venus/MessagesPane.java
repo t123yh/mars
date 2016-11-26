@@ -178,9 +178,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		luaTabRunButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				org.luaj.vm2.Globals globals = JsePlatform.standardGlobals();
-				globals.load(new mars.lua.LuaBinding());
-				LuaValue chunk = globals.load(luaTextArea.getText());
+				LuaValue chunk = Globals.getLuaBinding().getGlobals().load(luaTextArea.getText());
 				chunk.call();
 			}
 		});

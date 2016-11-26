@@ -5,6 +5,9 @@ import mars.mips.instructions.syscalls.*;
 import mars.*;
 import mars.util.*;
 import java.util.*;
+
+import org.luaj.vm2.LuaValue;
+
 import java.io.*;
 
 /*
@@ -46,25 +49,56 @@ import java.io.*;
 
 public class InstructionSet
 {
-    private ArrayList instructionList;
-    private ArrayList opcodeMatchMaps;
+    private ArrayList<Instruction> instructionList;
+    private ArrayList<MatchMap> opcodeMatchMaps;
     private SyscallLoader syscallLoader;
     /**
      * Creates a new InstructionSet object.
      */
     public InstructionSet()
     {
-        instructionList = new ArrayList();
+        instructionList = new ArrayList<Instruction>();
 
     }
     /**
      * Retrieve the current instruction set.
      */
-    public ArrayList getInstructionList()
+    public ArrayList<Instruction> getInstructionList()
     {
         return instructionList;
 
     }
+
+    public void registerInstruction(String template, BasicInstructionFormat format, String encoding, SimulationCode code)
+    {
+    	Instruction inst = new BasicInstruction(template, format, encoding, code);
+    	inst.createExampleTokenList();
+    	instructionList.add(inst);
+    }
+    
+    public void generateMatchMaps()
+    {
+        HashMap<Integer, HashMap<Integer, BasicInstruction>> maskMap = new HashMap<Integer, HashMap<Integer, BasicInstruction>>();
+        ArrayList<MatchMap> matchMaps = new ArrayList<MatchMap>();
+        for (int i = 0; i < instructionList.size(); i++) {
+            Object rawInstr = instructionList.get(i);
+            if (rawInstr instanceof BasicInstruction) {
+                BasicInstruction basic = (BasicInstruction) rawInstr;
+                Integer mask = Integer.valueOf(basic.getOpcodeMask());
+                Integer match = Integer.valueOf(basic.getOpcodeMatch());
+                HashMap<Integer, BasicInstruction> matchMap = (HashMap<Integer, BasicInstruction>) maskMap.get(mask);
+                if (matchMap == null) {
+                    matchMap = new HashMap<Integer, BasicInstruction>();
+                    maskMap.put(mask, matchMap);
+                    matchMaps.add(new MatchMap(mask, matchMap));
+                }
+                matchMap.put(match, basic);
+            }
+        }
+        Collections.sort(matchMaps);
+        this.opcodeMatchMaps = matchMaps;
+    }
+
     /**
      * Adds all instructions to the set.  A given extended instruction may have
      * more than one Instruction object, depending on how many formats it can have.
@@ -710,7 +744,7 @@ public class InstructionSet
                             {
                                 int address = RegisterFile.getValue(operands[2]) + operands[1];
                                 int result = RegisterFile.getValue(operands[0]);
-                                for (int i=0; i<=address % Globals.memory.WORD_LENGTH_BYTES; i++) {
+                                for (int i=0; i<=address % Memory.WORD_LENGTH_BYTES; i++) {
                                     result = Binary.setByte(result,3-i,Globals.memory.getByte(address-i));
                                 }
                                 RegisterFile.updateRegister(operands[0], result);
@@ -735,7 +769,7 @@ public class InstructionSet
                             {
                                 int address = RegisterFile.getValue(operands[2]) + operands[1];
                                 int result = RegisterFile.getValue(operands[0]);
-                                for (int i=0; i<=3-(address % Globals.memory.WORD_LENGTH_BYTES); i++) {
+                                for (int i=0; i<=3-(address % Memory.WORD_LENGTH_BYTES); i++) {
                                     result = Binary.setByte(result,i,Globals.memory.getByte(address+i));
                                 }
                                 RegisterFile.updateRegister(operands[0], result);
@@ -807,7 +841,7 @@ public class InstructionSet
                             {
                                 int address = RegisterFile.getValue(operands[2]) + operands[1];
                                 int source = RegisterFile.getValue(operands[0]);
-                                for (int i=0; i<=address % Globals.memory.WORD_LENGTH_BYTES; i++) {
+                                for (int i=0; i<=address % Memory.WORD_LENGTH_BYTES; i++) {
                                     Globals.memory.setByte(address-i,Binary.getByte(source,3-i));
                                 }
                             }
@@ -831,7 +865,7 @@ public class InstructionSet
                             {
                                 int address = RegisterFile.getValue(operands[2]) + operands[1];
                                 int source = RegisterFile.getValue(operands[0]);
-                                for (int i=0; i<=3-(address % Globals.memory.WORD_LENGTH_BYTES); i++) {
+                                for (int i=0; i<=3-(address % Memory.WORD_LENGTH_BYTES); i++) {
                                     Globals.memory.setByte(address+i,Binary.getByte(source,i));
                                 }
                             }
@@ -2747,7 +2781,7 @@ public class InstructionSet
                                 throw new ProcessingException(statement, "first register must be even-numbered");
                             }
                             // IF statement added by DPS 13-July-2011.
-                            if (!Globals.memory.doublewordAligned(RegisterFile.getValue(operands[2]) + operands[1])) {
+                            if (!Memory.doublewordAligned(RegisterFile.getValue(operands[2]) + operands[1])) {
                                 throw new ProcessingException(statement,
                                         new AddressErrorException("address not aligned on doubleword boundary ",
                                             Exceptions.ADDRESS_EXCEPTION_LOAD, RegisterFile.getValue(operands[2]) + operands[1]));
@@ -2804,7 +2838,7 @@ public class InstructionSet
                                 throw new ProcessingException(statement, "first register must be even-numbered");
                             }
                             // IF statement added by DPS 13-July-2011.
-                            if (!Globals.memory.doublewordAligned(RegisterFile.getValue(operands[2]) + operands[1])) {
+                            if (!Memory.doublewordAligned(RegisterFile.getValue(operands[2]) + operands[1])) {
                                 throw new ProcessingException(statement,
                                         new AddressErrorException("address not aligned on doubleword boundary ",
                                             Exceptions.ADDRESS_EXCEPTION_STORE, RegisterFile.getValue(operands[2]) + operands[1]));
@@ -3070,33 +3104,15 @@ public class InstructionSet
         // used by parser to determine user program correct syntax.
         for (int i = 0; i < instructionList.size(); i++)
         {
-            Instruction inst = (Instruction) instructionList.get(i);
+            Instruction inst = instructionList.get(i);
             inst.createExampleTokenList();
         }
-
-        HashMap maskMap = new HashMap();
-        ArrayList matchMaps = new ArrayList();
-        for (int i = 0; i < instructionList.size(); i++) {
-            Object rawInstr = instructionList.get(i);
-            if (rawInstr instanceof BasicInstruction) {
-                BasicInstruction basic = (BasicInstruction) rawInstr;
-                Integer mask = Integer.valueOf(basic.getOpcodeMask());
-                Integer match = Integer.valueOf(basic.getOpcodeMatch());
-                HashMap matchMap = (HashMap) maskMap.get(mask);
-                if (matchMap == null) {
-                    matchMap = new HashMap();
-                    maskMap.put(mask, matchMap);
-                    matchMaps.add(new MatchMap(mask, matchMap));
-                }
-                matchMap.put(match, basic);
-            }
-        }
-        Collections.sort(matchMaps);
-        this.opcodeMatchMaps = matchMaps;
+        
+        generateMatchMaps();
     }
 
     public BasicInstruction findByBinaryCode(int binaryInstr) {
-        ArrayList matchMaps = this.opcodeMatchMaps;
+        ArrayList<MatchMap> matchMaps = this.opcodeMatchMaps;
         for (int i = 0; i < matchMaps.size(); i++) {
             MatchMap map = (MatchMap) matchMaps.get(i);
             BasicInstruction ret = map.find(binaryInstr);
@@ -3105,17 +3121,14 @@ public class InstructionSet
         return null;
     }
 
-    /*  METHOD TO ADD PSEUDO-INSTRUCTIONS
-    */
-
+    // METHOD TO ADD PSEUDO-INSTRUCTIONS
     private void addPseudoInstructions()
     {
         InputStream is = null;
         BufferedReader in = null;
         try
         {
-            // leading "/" prevents package name being prepended to filepath.
-            is = ResourceLoader.loadResource("PseudoOps.txt");
+            is = mars.resource.ResourceLoader.loadResource("PseudoOps.txt");
             in = new BufferedReader(new InputStreamReader(is));
         }
         catch (NullPointerException e)
@@ -3186,16 +3199,16 @@ public class InstructionSet
      *  @param name operator mnemonic (e.g. addi, sw,...)
      *  @return list of corresponding Instruction object(s), or null if not found.
      */
-    public ArrayList matchOperator(String name)
+    public ArrayList<Instruction> matchOperator(String name)
     {
-        ArrayList matchingInstructions = null;
+        ArrayList<Instruction> matchingInstructions = null;
         // Linear search for now....
         for (int i = 0; i < instructionList.size(); i++)
         {
             if (((Instruction) instructionList.get(i)).getName().equalsIgnoreCase(name))
             {
                 if (matchingInstructions == null)
-                    matchingInstructions = new ArrayList();
+                    matchingInstructions = new ArrayList<Instruction>();
                 matchingInstructions.add(instructionList.get(i));
             }
         }
@@ -3210,9 +3223,9 @@ public class InstructionSet
      *  @param name a string
      *  @return list of matching Instruction object(s), or null if none match.
      */
-    public ArrayList prefixMatchOperator(String name)
+    public ArrayList<Instruction> prefixMatchOperator(String name)
     {
-        ArrayList matchingInstructions = null;
+        ArrayList<Instruction> matchingInstructions = null;
         // Linear search for now....
         if (name != null) {
             for (int i = 0; i < instructionList.size(); i++)
@@ -3220,7 +3233,7 @@ public class InstructionSet
                 if (((Instruction) instructionList.get(i)).getName().toLowerCase().startsWith(name.toLowerCase()))
                 {
                     if (matchingInstructions == null)
-                        matchingInstructions = new ArrayList();
+                        matchingInstructions = new ArrayList<Instruction>();
                     matchingInstructions.add(instructionList.get(i));
                 }
             }
@@ -3262,7 +3275,7 @@ public class InstructionSet
     // ProgramStatement.java, buildBasicStatementFromBasicInstruction() method near
     // the bottom (currently line 194, heavily commented).
 
-    private void processBranch(int displacement) {
+    public static void processBranch(int displacement) {
         if (Globals.getSettings().getDelayedBranchingEnabled()) {
             // Register the branch target address (absolute byte address).
             DelayedBranch.register(RegisterFile.getProgramCounter() + (displacement << 2));
@@ -3288,7 +3301,7 @@ public class InstructionSet
      * Handles delayed branching if that setting is enabled.
      */
 
-    private void processJump(int targetAddress) {
+    public static void processJump(int targetAddress) {
         if (Globals.getSettings().getDelayedBranchingEnabled()) {
             DelayedBranch.register(targetAddress);
             if (Globals.getSettings().getBackSteppingEnabled()) {
@@ -3318,12 +3331,12 @@ public class InstructionSet
                  Instruction.INSTRUCTION_LENGTH : 0) );
     }
 
-    private static class MatchMap implements Comparable {
+    private static class MatchMap implements Comparable<Object> {
         private int mask;
         private int maskLength; // number of 1 bits in mask
-        private HashMap matchMap;
+        private HashMap<Integer, BasicInstruction> matchMap;
 
-        public MatchMap(int mask, HashMap matchMap) {
+        public MatchMap(int mask, HashMap<Integer, BasicInstruction> matchMap) {
             this.mask = mask;
             this.matchMap = matchMap;
 
