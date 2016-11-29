@@ -30,6 +30,7 @@ public class LuaBinding extends TwoArgFunction {
 	public LuaValue call(LuaValue modname, LuaValue env) {
 		env.set("getgpr", new LuaFunc_getgpr());
 		env.set("setgpr", new LuaFunc_setgpr());
+		env.set("getpc", new LuaFunc_getpc());
 		env.set("loadb", new LuaFunc_loadb());
 		env.set("loadh", new LuaFunc_loadh());
 		env.set("loadw", new LuaFunc_loadw());
@@ -57,6 +58,12 @@ public class LuaBinding extends TwoArgFunction {
 			int val = lvVal.checkint();
 			RegisterFile.updateRegister(num, val);
 			return LuaValue.NIL;
+		}
+	}
+
+	static class LuaFunc_getpc extends ZeroArgFunction {
+		public LuaValue call() {
+			return LuaNumber.valueOf(RegisterFile.getProgramCounter());
 		}
 	}
 
