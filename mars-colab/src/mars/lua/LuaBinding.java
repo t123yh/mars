@@ -176,7 +176,7 @@ public class LuaBinding extends TwoArgFunction {
 			String template = args.arg(1).checkjstring();
 			String formatStr = args.arg(2).checkjstring();
 			String encoding = args.arg(3).checkjstring();
-			LuaFunction func = args.arg(4).checkfunction();
+			final LuaFunction func = args.arg(4).checkfunction();
 
 			BasicInstructionFormat format = null;
 			switch (formatStr) {
