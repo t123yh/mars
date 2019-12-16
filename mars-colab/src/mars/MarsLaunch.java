@@ -111,7 +111,7 @@ public class MarsLaunch {
     private boolean countInstructions; // Whether to count and report number of instructions executed
     private boolean selfModifyingCode; // Whether to allow self-modifying code (e.g. write to text segment)
     private static final String rangeSeparator = "-";
-    private static final int splashDuration = 2000; // time in MS to show splash screen
+    private static final int splashDuration = 100; // time in MS to show splash screen
     private static final int memoryWordsPerLine = 4; // display 4 memory words, tab separated, per line
     private static final int DECIMAL = 0; // memory and register display format
     private static final int HEXADECIMAL = 1;// memory and register display format
