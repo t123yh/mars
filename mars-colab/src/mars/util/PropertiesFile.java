@@ -42,28 +42,27 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 public class PropertiesFile {
 
-	/**
-	 * Produce Properties (a Hashtable) object containing key-value pairs from
-	 * specified properties file. This may be used as an alternative to
-	 * readPropertiesFile() which uses a different implementation.
-	 *
-	 * @param file
-	 *            Properties filename. Do NOT include the file extension as it
-	 *            is assumed to be ".properties" and is added here.
-	 * @return Properties (Hashtable) of key-value pairs read from the file.
-	 */
+    /**
+     * Produce Properties (a Hashtable) object containing key-value pairs from
+     * specified properties file. This may be used as an alternative to
+     * readPropertiesFile() which uses a different implementation.
+     *
+     * @param file Properties filename. Do NOT include the file extension as it
+     *             is assumed to be ".properties" and is added here.
+     * @return Properties (Hashtable) of key-value pairs read from the file.
+     */
 
-	public static Properties loadPropertiesFromFile(String file) {
-		Properties properties = new Properties();
-		String resourcePath = file + ".properties";
-		try {
-			InputStream is = mars.resource.ResourceLoader.loadResource(resourcePath);
-			if (is == null) {
-				System.err.printf("Resource not found: %s%n", resourcePath);
-			}
-			properties.load(is);
-		} catch (IOException ioe) {
-		} // If it doesn't work, properties will be empty
-		return properties;
-	}
+    public static Properties loadPropertiesFromFile(String file) {
+        Properties properties = new Properties();
+        String resourcePath = file + ".properties";
+        try {
+            InputStream is = mars.resource.ResourceLoader.loadResource(resourcePath);
+            if (is == null) {
+                System.err.printf("Resource not found: %s%n", resourcePath);
+            }
+            properties.load(is);
+        } catch (IOException ioe) {
+        } // If it doesn't work, properties will be empty
+        return properties;
+    }
 }

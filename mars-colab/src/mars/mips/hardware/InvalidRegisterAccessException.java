@@ -1,4 +1,5 @@
 package mars.mips.hardware;
+
 import mars.*;
 
 /*
@@ -38,13 +39,12 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  **/
 
 public class InvalidRegisterAccessException extends Exception {
-   private ErrorList errs;
+    private ErrorList errs;
 
-   /**
-    * Constructor for IllegalRegisterException.
-    *
-    **/
-   public InvalidRegisterAccessException() {
-   }
+    /**
+     * Constructor for IllegalRegisterException.
+     **/
+    public InvalidRegisterAccessException() {
+    }
 
- }
+}

@@ -1,9 +1,11 @@
-   package mars.venus;
-   import mars.*;
-   import mars.util.*;
-   import java.awt.*;
-   import java.awt.event.*;
-   import javax.swing.*;
+package mars.venus;
+
+import mars.*;
+import mars.util.*;
+
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
 
 	/*
 Copyright (c) 2003-2006,  Pete Sanderson and Kenneth Vollmar
@@ -40,65 +42,67 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * is added later, the Component will need to change.
  */
 
-    public class NumberDisplayBaseChooser extends JCheckBox {
-      public static final int DECIMAL = 10;
-      public static final int HEXADECIMAL = 16;
-      public static final int ASCII = 0;
-      private int base;
-      private JCheckBoxMenuItem settingMenuItem;
+public class NumberDisplayBaseChooser extends JCheckBox {
+    public static final int DECIMAL = 10;
+    public static final int HEXADECIMAL = 16;
+    public static final int ASCII = 0;
+    private int base;
+    private JCheckBoxMenuItem settingMenuItem;
 
-   /**
-    * constructor. It assumes the text will be worded
-    * so that a checked box means hexadecimal!
-    * @param text Text to accompany the check box.
-    * @param defaultBase Currently either DECIMAL or HEXADECIMAL
-    */
-       public NumberDisplayBaseChooser(String text, boolean displayInHex) {
-         super(text, displayInHex);
-         base = getBase(displayInHex);
-         addItemListener(
-                new  ItemListener() {
-                   public void itemStateChanged(ItemEvent ie) {
-                     NumberDisplayBaseChooser choose = (NumberDisplayBaseChooser)ie.getItem();
-                     if (ie.getStateChange() == ItemEvent.SELECTED) {
-                        choose.setBase(NumberDisplayBaseChooser.HEXADECIMAL);
-                     }
-                     else {
-                        choose.setBase(NumberDisplayBaseChooser.DECIMAL);
-                     }
-                  	// Better to use notify, but I am tired...
-                     if (settingMenuItem!=null) {
-                        settingMenuItem.setSelected(choose.isSelected());
-                        ActionListener[] listeners = settingMenuItem.getActionListeners();
-                        ActionEvent event = new ActionEvent(settingMenuItem, 0, "chooser");
-                        for (int i=0; i<listeners.length; i++) {
-                           listeners[i].actionPerformed(event);
+    /**
+     * constructor. It assumes the text will be worded
+     * so that a checked box means hexadecimal!
+     *
+     * @param text        Text to accompany the check box.
+     * @param defaultBase Currently either DECIMAL or HEXADECIMAL
+     */
+    public NumberDisplayBaseChooser(String text, boolean displayInHex) {
+        super(text, displayInHex);
+        base = getBase(displayInHex);
+        addItemListener(
+                new ItemListener() {
+                    public void itemStateChanged(ItemEvent ie) {
+                        NumberDisplayBaseChooser choose = (NumberDisplayBaseChooser) ie.getItem();
+                        if (ie.getStateChange() == ItemEvent.SELECTED) {
+                            choose.setBase(NumberDisplayBaseChooser.HEXADECIMAL);
+                        } else {
+                            choose.setBase(NumberDisplayBaseChooser.DECIMAL);
                         }
-                     }
-                  	// Better to use notify, but I am tired...
-                     Globals.getGui().getMainPane().getExecutePane().numberDisplayBaseChanged(choose);
-                  }
-               });
-      }
+                        // Better to use notify, but I am tired...
+                        if (settingMenuItem != null) {
+                            settingMenuItem.setSelected(choose.isSelected());
+                            ActionListener[] listeners = settingMenuItem.getActionListeners();
+                            ActionEvent event = new ActionEvent(settingMenuItem, 0, "chooser");
+                            for (int i = 0; i < listeners.length; i++) {
+                                listeners[i].actionPerformed(event);
+                            }
+                        }
+                        // Better to use notify, but I am tired...
+                        Globals.getGui().getMainPane().getExecutePane().numberDisplayBaseChanged(choose);
+                    }
+                });
+    }
 
-   /**
-    * Retrieve the current number base.
-    * @return current number base, currently DECIMAL or HEXADECIMAL
-    */
-       public int getBase() {
-         return base;
-      }
+    /**
+     * Retrieve the current number base.
+     *
+     * @return current number base, currently DECIMAL or HEXADECIMAL
+     */
+    public int getBase() {
+        return base;
+    }
 
-   /**
-    * Set the current number base.
-    * @param newBase The new number base.  Currently, if it is
-    * neither DECIMAL nor HEXADECIMAL, the base will not be changed.
-    */
-       public void setBase(int newBase) {
-         if (newBase == DECIMAL || newBase == HEXADECIMAL) {
+    /**
+     * Set the current number base.
+     *
+     * @param newBase The new number base.  Currently, if it is
+     *                neither DECIMAL nor HEXADECIMAL, the base will not be changed.
+     */
+    public void setBase(int newBase) {
+        if (newBase == DECIMAL || newBase == HEXADECIMAL) {
             base = newBase;
-         }
-      }
+        }
+    }
 
 
     /**
@@ -108,18 +112,18 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
      * is same as for formatNumber().  If base is 10, will produce
      * string version of unsigned value.  E.g. 0xffffffff will produce
      * "4294967295" instead of "-1".
+     *
      * @param value the number to be converted
-     * @param base the numerical base to use (currently 10 or 16)
+     * @param base  the numerical base to use (currently 10 or 16)
      * @return a String equivalent of the value rendered appropriately.
      */
-       public static String formatUnsignedInteger(int value, int base) {
-         if (base == NumberDisplayBaseChooser.HEXADECIMAL) {
+    public static String formatUnsignedInteger(int value, int base) {
+        if (base == NumberDisplayBaseChooser.HEXADECIMAL) {
             return Binary.intToHexString(value);
-         }
-         else {
+        } else {
             return Binary.unsignedIntToIntString(value);
-         }
-      }
+        }
+    }
 
 
     /**
@@ -127,33 +131,34 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
      * numerical base to convert it to.  There is an instance
      * method that uses the internally stored base.  This class
      * method can be used by anyone anytime.
+     *
      * @param value the number to be converted
-     * @param base the numerical base to use (currently 10 or 16)
+     * @param base  the numerical base to use (currently 10 or 16)
      * @return a String equivalent of the value rendered appropriately.
      */
-       public static String formatNumber(int value, int base) {
-         String result;
-         switch (base) {
-            case HEXADECIMAL :
-               result = Binary.intToHexString(value);
-               break;
-            case DECIMAL :
-               result =  Integer.toString(value);
-               break;
-            case ASCII :
-               result = Binary.intToAscii(value);
-               break;
-            default :
-               result = Integer.toString(value);
-         }
-         return result;
-      //          if (base == NumberDisplayBaseChooser.HEXADECIMAL) {
-      //             return Binary.intToHexString(value);
-      //          }
-      //          else {
-      //             return Integer.toString(value);
-      //          }
-      }
+    public static String formatNumber(int value, int base) {
+        String result;
+        switch (base) {
+            case HEXADECIMAL:
+                result = Binary.intToHexString(value);
+                break;
+            case DECIMAL:
+                result = Integer.toString(value);
+                break;
+            case ASCII:
+                result = Binary.intToAscii(value);
+                break;
+            default:
+                result = Integer.toString(value);
+        }
+        return result;
+        //          if (base == NumberDisplayBaseChooser.HEXADECIMAL) {
+        //             return Binary.intToHexString(value);
+        //          }
+        //          else {
+        //             return Integer.toString(value);
+        //          }
+    }
 
 
     /**
@@ -161,18 +166,18 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
      * numerical base to convert it to.  There is an instance
      * method that uses the internally stored base.  This class
      * method can be used by anyone anytime.
+     *
      * @param value the number to be converted
-     * @param base the numerical base to use (currently 10 or 16)
+     * @param base  the numerical base to use (currently 10 or 16)
      * @return a String equivalent of the value rendered appropriately.
      */
-       public static String formatNumber(float value, int base) {
-         if (base == NumberDisplayBaseChooser.HEXADECIMAL) {
+    public static String formatNumber(float value, int base) {
+        if (base == NumberDisplayBaseChooser.HEXADECIMAL) {
             return Binary.intToHexString(Float.floatToIntBits(value));
-         }
-         else {
+        } else {
             return Float.toString(value);
-         }
-      }
+        }
+    }
 
 
     /**
@@ -180,47 +185,48 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
      * numerical base to convert it to.  There is an instance
      * method that uses the internally stored base.  This class
      * method can be used by anyone anytime.
+     *
      * @param value the number to be converted
-     * @param base the numerical base to use (currently 10 or 16)
+     * @param base  the numerical base to use (currently 10 or 16)
      * @return a String equivalent of the value rendered appropriately.
      */
-       public static String formatNumber(double value, int base) {
-         if (base == NumberDisplayBaseChooser.HEXADECIMAL) {
+    public static String formatNumber(double value, int base) {
+        if (base == NumberDisplayBaseChooser.HEXADECIMAL) {
             long lguy = Double.doubleToLongBits(value);
-            return Binary.intToHexString(Binary.highOrderLongToInt(lguy))+
-                  Binary.intToHexString(Binary.lowOrderLongToInt(lguy)).substring(2);
-         }
-         else {
+            return Binary.intToHexString(Binary.highOrderLongToInt(lguy)) +
+                    Binary.intToHexString(Binary.lowOrderLongToInt(lguy)).substring(2);
+        } else {
             return Double.toString(value);
-         }
-      }
+        }
+    }
 
     /**
      * Produces a string form of a number given the value.  There
      * is also an class (static method) that uses a specified
      * base.
+     *
      * @param value the number to be converted
      * @return a String equivalent of the value rendered appropriately.
      */
-       public String formatNumber(int value) {
-         if (base == NumberDisplayBaseChooser.HEXADECIMAL) {
+    public String formatNumber(int value) {
+        if (base == NumberDisplayBaseChooser.HEXADECIMAL) {
             return Binary.intToHexString(value);
-         }
-         else {
+        } else {
             return new Integer(value).toString();
-         }
-      }
+        }
+    }
 
     /**
      * Produces a string form of an unsigned integer given the value.  There
      * is also an class (static method) that uses a specified base.
      * If the current base is 16, this produces the same result as formatNumber().
+     *
      * @param value the number to be converted
      * @return a String equivalent of the value rendered appropriately.
      */
-       public String formatUnsignedInteger(int value) {
-         return formatUnsignedInteger(value, base);
-      }
+    public String formatUnsignedInteger(int value) {
+        return formatUnsignedInteger(value, base);
+    }
 
 
     /**
@@ -237,19 +243,18 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
      * pattern!  Then converting it to hex string yields the canonical NaN.
      * Not an issue if display base is 10 since result string will be NaN
      * no matter what the internal NaN value is.
-
+     *
      * @param value the int bits to be converted to string of corresponding float.
-     * @param base the numerical base to use (currently 10 or 16)
+     * @param base  the numerical base to use (currently 10 or 16)
      * @return a String equivalent of the value rendered appropriately.
      */
-       public static String formatFloatNumber(int value, int base) {
-         if (base == NumberDisplayBaseChooser.HEXADECIMAL) {
+    public static String formatFloatNumber(int value, int base) {
+        if (base == NumberDisplayBaseChooser.HEXADECIMAL) {
             return Binary.intToHexString(value);
-         }
-         else {
+        } else {
             return Float.toString(Float.intBitsToFloat(value));
-         }
-      }
+        }
+    }
 
     /**
      * Produces a string form of a double given a long containing
@@ -265,38 +270,38 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
      * pattern!  Then converting it to hex string yields the canonical NaN.
      * Not an issue if display base is 10 since result string will be NaN
      * no matter what the internal NaN value is.
-
+     *
      * @param value the long bits to be converted to string of corresponding double.
-     * @param base the numerical base to use (currently 10 or 16)
+     * @param base  the numerical base to use (currently 10 or 16)
      * @return a String equivalent of the value rendered appropriately.
      */
-       public static String formatDoubleNumber(long value, int base) {
-         if (base == NumberDisplayBaseChooser.HEXADECIMAL) {
+    public static String formatDoubleNumber(long value, int base) {
+        if (base == NumberDisplayBaseChooser.HEXADECIMAL) {
             return Binary.longToHexString(value);
-         }
-         else {
+        } else {
             return Double.toString(Double.longBitsToDouble(value));
-         }
-      }
+        }
+    }
 
 
-   	/**
-   	 *  Set the menu item from Settings menu that corresponds to this chooser.
-   	 *  It is the responsibility of that item to register here, because this
-   	 *  one is created first (before the menu item).  They need to communicate
-   	 *  with each other so that whenever one changes, so does the other.  They
-   	 *  cannot be the same object (one is JCheckBox, the other is JCheckBoxMenuItem).
-   	 */
-       public void setSettingsMenuItem(JCheckBoxMenuItem setter) {
-         settingMenuItem = setter;
-      }
+    /**
+     * Set the menu item from Settings menu that corresponds to this chooser.
+     * It is the responsibility of that item to register here, because this
+     * one is created first (before the menu item).  They need to communicate
+     * with each other so that whenever one changes, so does the other.  They
+     * cannot be the same object (one is JCheckBox, the other is JCheckBoxMenuItem).
+     */
+    public void setSettingsMenuItem(JCheckBoxMenuItem setter) {
+        settingMenuItem = setter;
+    }
 
 
-   	/**
-   	 *  Return the number base corresponding to the specified setting.
-   	 *  @return HEXADECIMAL if setting is true, DECIMAL otherwise.
-   	 */
-       public static int getBase(boolean setting) {
-         return (setting) ? HEXADECIMAL : DECIMAL ;
-      }
-   }
+    /**
+     * Return the number base corresponding to the specified setting.
+     *
+     * @return HEXADECIMAL if setting is true, DECIMAL otherwise.
+     */
+    public static int getBase(boolean setting) {
+        return (setting) ? HEXADECIMAL : DECIMAL;
+    }
+}

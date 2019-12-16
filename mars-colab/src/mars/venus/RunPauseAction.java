@@ -1,10 +1,12 @@
-   package mars.venus;
-   import mars.simulator.*;
-   import java.util.*;
-   import java.awt.*;
-   import java.awt.event.*;
-   import javax.swing.*;
-   import java.io.*;
+package mars.venus;
+
+import mars.simulator.*;
+
+import java.util.*;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import java.io.*;
 
 	/*
 Copyright (c) 2003-2006,  Pete Sanderson and Kenneth Vollmar
@@ -34,19 +36,19 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 (MIT license, http://www.opensource.org/licenses/mit-license.html)
  */
 
-   /**
-    * Action class for the Run -> Pause menu item (and toolbar icon)
-    */
-    public class RunPauseAction extends GuiAction  {
+/**
+ * Action class for the Run -> Pause menu item (and toolbar icon)
+ */
+public class RunPauseAction extends GuiAction {
 
-       public RunPauseAction(String name, Icon icon, String descrip,
-                             Integer mnemonic, KeyStroke accel, VenusUI gui) {
-         super(name, icon, descrip, mnemonic, accel, gui);
-      }
+    public RunPauseAction(String name, Icon icon, String descrip,
+                          Integer mnemonic, KeyStroke accel, VenusUI gui) {
+        super(name, icon, descrip, mnemonic, accel, gui);
+    }
 
-       public void actionPerformed(ActionEvent e) {
-         Simulator.getInstance().stopExecution(this);
-         // RunGoAction's "paused" method will do the cleanup.
-      }
+    public void actionPerformed(ActionEvent e) {
+        Simulator.getInstance().stopExecution(this);
+        // RunGoAction's "paused" method will do the cleanup.
+    }
 
-   }
+}

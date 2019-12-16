@@ -1,4 +1,5 @@
 package mars.mips.instructions;
+
 import mars.*;
 
 /*
@@ -36,7 +37,6 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  * @author Pete Sanderson
  * @version August 2003
- *
  */
 
 public interface SimulationCode {
@@ -48,5 +48,5 @@ public interface SimulationCode {
      * @throws ProcessingException This is a run-time exception generated during simulation.
      **/
 
-	public void simulate(ProgramStatement statement) throws ProcessingException;
+    public void simulate(ProgramStatement statement) throws ProcessingException;
 }

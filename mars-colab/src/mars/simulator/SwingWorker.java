@@ -1,4 +1,5 @@
 package mars.simulator;
+
 import javax.swing.SwingUtilities;
 
 /*-----------------------------------------------------
@@ -13,9 +14,9 @@ import javax.swing.SwingUtilities;
  * SwingWorker 3), an abstract class that you subclass to
  * perform GUI-related work in a dedicated thread.  For
  * instructions on and examples of using this class, see:
- *
+ * <p>
  * http://java.sun.com/docs/books/tutorial/uiswing/misc/threads.html
- *
+ * <p>
  * Note that the API changed slightly in the 3rd version:
  * You must now invoke start() on the SwingWorker after
  * creating it.
@@ -29,9 +30,18 @@ public abstract class SwingWorker {
      */
     private static class ThreadVar {
         private Thread thread;
-        ThreadVar(Thread t) { thread = t; }
-        synchronized Thread get() { return thread; }
-        synchronized void clear() { thread = null; }
+
+        ThreadVar(Thread t) {
+            thread = t;
+        }
+
+        synchronized Thread get() {
+            return thread;
+        }
+
+        synchronized void clear() {
+            thread = null;
+        }
     }
 
     private ThreadVar threadVar;
@@ -90,8 +100,7 @@ public abstract class SwingWorker {
             }
             try {
                 t.join();
-            }
-            catch (InterruptedException e) {
+            } catch (InterruptedException e) {
                 Thread.currentThread().interrupt(); // propagate
                 return null;
             }
@@ -102,19 +111,21 @@ public abstract class SwingWorker {
     /**
      * Start a thread that will call the <code>construct</code> method
      * and then exit.
-	  * @param useSwing Set true if MARS is running from GUI, false otherwise.
+     *
+     * @param useSwing Set true if MARS is running from GUI, false otherwise.
      */
     public SwingWorker(final boolean useSwing) {
         final Runnable doFinished = new Runnable() {
-           public void run() { finished(); }
+            public void run() {
+                finished();
+            }
         };
 
         Runnable doConstruct = new Runnable() {
             public void run() {
                 try {
                     setValue(construct());
-                }
-                finally {
+                } finally {
                     threadVar.clear();
                 }
 
@@ -123,10 +134,10 @@ public abstract class SwingWorker {
             }
         };
 
-	     // Thread that represents executing MIPS program...
+        // Thread that represents executing MIPS program...
         Thread t = new Thread(doConstruct, "MIPS");
 
-		  //t.setPriority(Thread.NORM_PRIORITY-1);//******************
+        //t.setPriority(Thread.NORM_PRIORITY-1);//******************
 
         threadVar = new ThreadVar(t);
     }

@@ -46,142 +46,149 @@ package mars.tools;//.bhtsim;
 
 public class BHTEntry {
 
-	/** the history of the BHT entry. Each boolean value signals if the branch was taken or not. The value at index n-1 represents the most recent branch outcome. */
-	private boolean m_history[];
+    /**
+     * the history of the BHT entry. Each boolean value signals if the branch was taken or not. The value at index n-1 represents the most recent branch outcome.
+     */
+    private boolean m_history[];
 
-	/** the current prediction */
-	private boolean m_prediction;
+    /**
+     * the current prediction
+     */
+    private boolean m_prediction;
 
-	/** absolute number of incorrect predictions */
-	private int m_incorrect;
+    /**
+     * absolute number of incorrect predictions
+     */
+    private int m_incorrect;
 
-	/** absolute number of correct predictions */
-	private int m_correct;
-
-
-	/**
-	 * Constructs a BHT entry with a given history size.
-	 *
-	 * The size of the history can only be set via the constructor and cannot be changed afterwards.
-	 *
-	 * @param historySize number of past branch outcomes to remember
-	 * @param initVal the initial value of the entry (take or do not take)
-	 */
-	public BHTEntry(int historySize, boolean initVal) {
-		m_prediction = initVal;
-		m_history = new boolean[historySize];
-
-		for (int i=0; i < historySize; i++) {
-			m_history[i] = initVal;
-		}
-		m_correct = m_incorrect = 0;
-	}
+    /**
+     * absolute number of correct predictions
+     */
+    private int m_correct;
 
 
-	/**
-	 * Returns the branch prediction based on the history.
-	 *
-	 * @return true if prediction is to take the branch, false otherwise
-	 */
-	public boolean getPrediction() {
-		return m_prediction;
-	}
+    /**
+     * Constructs a BHT entry with a given history size.
+     * <p>
+     * The size of the history can only be set via the constructor and cannot be changed afterwards.
+     *
+     * @param historySize number of past branch outcomes to remember
+     * @param initVal     the initial value of the entry (take or do not take)
+     */
+    public BHTEntry(int historySize, boolean initVal) {
+        m_prediction = initVal;
+        m_history = new boolean[historySize];
+
+        for (int i = 0; i < historySize; i++) {
+            m_history[i] = initVal;
+        }
+        m_correct = m_incorrect = 0;
+    }
 
 
-	/**
-	 * Updates the entry's history and prediction.
-	 * This method provides feedback for a prediction.
-	 * The history and the statistics are updated accordingly.
-	 * Based on the updated history a new prediction is calculated
-	 *
-	 * @param branchTaken signals if the branch was taken (true) or not (false)
-	 */
-	public void updatePrediction(boolean branchTaken) {
-
-		// update history
-		for (int i=0; i < m_history.length-1; i++) {
-			m_history[i] = m_history[i+1];
-		}
-		m_history[m_history.length-1] = branchTaken;
+    /**
+     * Returns the branch prediction based on the history.
+     *
+     * @return true if prediction is to take the branch, false otherwise
+     */
+    public boolean getPrediction() {
+        return m_prediction;
+    }
 
 
-		// if the prediction was correct, update stats and keep prediction
-		if (branchTaken == m_prediction) {
-			m_correct ++;
-		}
-		else {
-			m_incorrect ++;
+    /**
+     * Updates the entry's history and prediction.
+     * This method provides feedback for a prediction.
+     * The history and the statistics are updated accordingly.
+     * Based on the updated history a new prediction is calculated
+     *
+     * @param branchTaken signals if the branch was taken (true) or not (false)
+     */
+    public void updatePrediction(boolean branchTaken) {
 
-			// check if the prediction should change
-			boolean changePrediction = true;
-
-			for (int i=0; i < m_history.length; i++) {
-				if (m_history[i] != branchTaken)
-					changePrediction = false;
-			}
-
-			if (changePrediction)
-				m_prediction = !m_prediction;
-
-		}
-	}
+        // update history
+        for (int i = 0; i < m_history.length - 1; i++) {
+            m_history[i] = m_history[i + 1];
+        }
+        m_history[m_history.length - 1] = branchTaken;
 
 
-	/**
-	 * Get the absolute number of mispredictions.
-	 *
-	 * @return number of incorrect predictions (mispredictions)
-	 */
-	public int getStatsPredIncorrect() {
-		return m_incorrect;
-	}
+        // if the prediction was correct, update stats and keep prediction
+        if (branchTaken == m_prediction) {
+            m_correct++;
+        } else {
+            m_incorrect++;
+
+            // check if the prediction should change
+            boolean changePrediction = true;
+
+            for (int i = 0; i < m_history.length; i++) {
+                if (m_history[i] != branchTaken)
+                    changePrediction = false;
+            }
+
+            if (changePrediction)
+                m_prediction = !m_prediction;
+
+        }
+    }
 
 
-	/**
-	 * Get the absolute number of correct predictions.
-	 *
-	 * @return number of correct predictions
-	 */
-	public int getStatsPredCorrect() {
-		return m_correct;
-	}
+    /**
+     * Get the absolute number of mispredictions.
+     *
+     * @return number of incorrect predictions (mispredictions)
+     */
+    public int getStatsPredIncorrect() {
+        return m_incorrect;
+    }
 
 
-	/**
-	 * Get the percentage of correct predictions.
-	 *
-	 * @return the percentage of correct predictions
-	 */
-	public double getStatsPredPrecision() {
-		int sum = m_incorrect + m_correct;
-		return (sum==0) ? 0 : m_correct * 100.0 / sum;
-	}
+    /**
+     * Get the absolute number of correct predictions.
+     *
+     * @return number of correct predictions
+     */
+    public int getStatsPredCorrect() {
+        return m_correct;
+    }
 
 
-	/***
-	 * Builds a string representation of the BHT entry's history.
-	 * The history is a sequence of flags that signal if the branch was taken (T) or not taken (NT).
-	 *
-	 * @return a string representation of the BHT entry's history
-	 */
-	public String getHistoryAsStr() {
-		String result = "";
-
-		for (int i=0; i<m_history.length; i++) {
-			if (i>0) result = result + ", ";
-			result += m_history[i] ? "T" : "NT";
-		}
-		return result;
-	}
+    /**
+     * Get the percentage of correct predictions.
+     *
+     * @return the percentage of correct predictions
+     */
+    public double getStatsPredPrecision() {
+        int sum = m_incorrect + m_correct;
+        return (sum == 0) ? 0 : m_correct * 100.0 / sum;
+    }
 
 
-	/***
-	 * Returns a string representation of the BHT entry's current prediction.
-	 * The prediction can be either to TAKE or do NOT TAKE the branch.
-	 *
-	 * @return a string representation of the BHT entry's current prediction
-	 */
-	public String getPredictionAsStr() {
-		return m_prediction ? "TAKE" : "NOT TAKE";
-	}
+    /***
+     * Builds a string representation of the BHT entry's history.
+     * The history is a sequence of flags that signal if the branch was taken (T) or not taken (NT).
+     *
+     * @return a string representation of the BHT entry's history
+     */
+    public String getHistoryAsStr() {
+        String result = "";
+
+        for (int i = 0; i < m_history.length; i++) {
+            if (i > 0) result = result + ", ";
+            result += m_history[i] ? "T" : "NT";
+        }
+        return result;
+    }
+
+
+    /***
+     * Returns a string representation of the BHT entry's current prediction.
+     * The prediction can be either to TAKE or do NOT TAKE the branch.
+     *
+     * @return a string representation of the BHT entry's current prediction
+     */
+    public String getPredictionAsStr() {
+        return m_prediction ? "TAKE" : "NOT TAKE";
+    }
 }

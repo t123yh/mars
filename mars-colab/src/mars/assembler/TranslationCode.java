@@ -39,10 +39,10 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 public interface TranslationCode {
-      /**
-       *  This is a callback method defined in anonymous class specified as
-       *  argument to ExtendedInstruction constructor.  It is called when
-       *  assembler finds a program statement matching that ExtendedInstruction,
-       */
-	public void translate();
+    /**
+     * This is a callback method defined in anonymous class specified as
+     * argument to ExtendedInstruction constructor.  It is called when
+     * assembler finds a program statement matching that ExtendedInstruction,
+     */
+    public void translate();
 }
