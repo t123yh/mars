@@ -389,9 +389,13 @@ public class Simulator extends Observable {
                     int delayedBranchDest = DelayedBranch.getBranchTargetAddress();
                     RegisterFile.setProgramCounter(delayedBranchDest);
                     DelayedBranch.clear();
-                    Globals.program.getBackStepper().addRearmDelayedBranch(pc, delayedBranchDest);
+                    if (Globals.getSettings().getBackSteppingEnabled()) {
+                        Globals.program.getBackStepper().addRearmDelayedBranch(pc, delayedBranchDest);
+                    }
                 } else if (DelayedBranch.isRegistered()) {
-                    Globals.program.getBackStepper().addUntriggerDelayedBranch(pc);
+                    if (Globals.getSettings().getBackSteppingEnabled()) {
+                        Globals.program.getBackStepper().addUntriggerDelayedBranch(pc);
+                    }
                     DelayedBranch.trigger();
                 }//////////////////////////////////////////////////////////////////////
 
