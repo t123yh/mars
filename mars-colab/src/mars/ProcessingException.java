@@ -62,7 +62,8 @@ public class ProcessingException extends Exception {
      **/
     public ProcessingException(ErrorList e, AddressErrorException aee, int pc) {
         errs = e;
-        Exceptions.setRegisters(aee.getType(), pc, aee.getAddress());
+        Exceptions.setRegistersPC(aee.getType(), pc, false);
+        Exceptions.setVADDR(aee.getAddress());
     }
 
     /**
@@ -83,6 +84,20 @@ public class ProcessingException extends Exception {
         // been incremented).
     }
 
+    static void setCP0(ProgramStatement ps, int cause) {
+        int epc;
+        boolean bd;
+        if (DelayedBranch.isTriggered()) {
+            bd = true;
+            epc = DelayedBranch.getBranchInstructionAddress();
+        } else {
+            epc = ps.getAddress();
+            bd = false;
+        }
+
+        Exceptions.setRegistersPC(cause, epc, bd);
+    }
+
 
     /**
      * Constructor for ProcessingException to handle runtime exceptions
@@ -93,7 +108,7 @@ public class ProcessingException extends Exception {
      **/
     public ProcessingException(ProgramStatement ps, String m, int cause) {
         this(ps, m);
-        Exceptions.setRegistersPC(cause, ps.getAddress());
+        setCP0(ps, cause);
     }
 
 
@@ -106,7 +121,8 @@ public class ProcessingException extends Exception {
 
     public ProcessingException(ProgramStatement ps, AddressErrorException aee) {
         this(ps, aee.getMessage());
-        Exceptions.setRegisters(aee.getType(), ps.getAddress(), aee.getAddress());
+        setCP0(ps, aee.getType());
+        Exceptions.setVADDR(aee.getAddress());
     }
 
     /**

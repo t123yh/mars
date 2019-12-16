@@ -69,6 +69,7 @@ public class DelayedBranch {
 
     private static int state = CLEARED;
     private static int branchTargetAddress = 0;
+    private static int branchInstructionAddress = 0;
 
     /**
      * Register the fact that a successful branch is to occur.  This is called in
@@ -81,12 +82,13 @@ public class DelayedBranch {
      *
      * @param targetAddress The address to branch to after executing the next instruction
      */
-    public static void register(int targetAddress) {
+    public static void register(int targetAddress, int insAddr) {
 //		 System.out.println("DB register");
         // About as clean as a switch statement can be!
         switch (state) {
             case CLEARED:
                 branchTargetAddress = targetAddress;
+                branchInstructionAddress = insAddr;
             case REGISTERED:
             case TRIGGERED:
                 state = REGISTERED;
@@ -138,7 +140,7 @@ public class DelayedBranch {
      * @return true if branch is registered but not triggered, false otherwise.
      */
 
-    static boolean isRegistered() {
+    public static boolean isRegistered() {
         return state == REGISTERED;
     }
 
@@ -149,7 +151,7 @@ public class DelayedBranch {
      * @return true if branch is registered but not triggered, false otherwise.
      */
 
-    static boolean isTriggered() {
+    public static boolean isTriggered() {
         return state == TRIGGERED;
     }
 
@@ -165,5 +167,7 @@ public class DelayedBranch {
     static int getBranchTargetAddress() {
         return branchTargetAddress;
     }
+
+    public static int getBranchInstructionAddress() { return branchInstructionAddress; }
 
 }  // DelayedBranch

@@ -183,7 +183,7 @@ public class BackStepper {
                         case DO_NOTHING:
                             break;
                         case REARM_DELAYED_BRANCH:
-                            DelayedBranch.register(step.param1);
+                            DelayedBranch.register(step.param1, -1); // TODO: Fuck here
                             DelayedBranch.trigger();
                             break;
                         case UNTRIGGER_DELAYED_BRANCH:

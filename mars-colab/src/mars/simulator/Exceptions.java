@@ -74,11 +74,15 @@ public class Exceptions {
      *
      * @param cause The cause code (see Exceptions for a list)
      */
-    public static void setRegistersPC(int cause, int epc) {
+    public static void setRegistersPC(int cause, int epc, boolean bd) {
         // Set CAUSE register bits 2 thru 6 to cause value.  The "& 0xFFFFFC83" will set bits 2-6 and 8-9 to 0 while
         // keeping all the others.  Left-shift by 2 to put cause value into position then OR it in.  Bits 8-9 used to
         // identify devices for External Interrupt (8=keyboard,9=display).
-        Coprocessor0.updateRegister(Coprocessor0.CAUSE, (Coprocessor0.getValue(Coprocessor0.CAUSE) & 0xFFFFFC83 | (cause << 2)));
+        int oldCause = Coprocessor0.getValue(Coprocessor0.CAUSE) & 0x7FFFFC83;
+        oldCause |= (cause << 2);
+        if (bd)
+            oldCause |= 0x80000000;
+        Coprocessor0.updateRegister(Coprocessor0.CAUSE, oldCause);
         // When exception occurred, PC had already been incremented so need to subtract 4 here.
         Coprocessor0.updateRegister(Coprocessor0.EPC, epc & 0xFFFFFFFC);
         // Set EXL (Exception Level) bit, bit position 1, in STATUS register to 1.
@@ -89,12 +93,10 @@ public class Exceptions {
      * Given MIPS exception cause code and bad address, place the bad address into VADDR
      * register ($8) then call overloaded setRegisters with the cause code to do the rest.
      *
-     * @param cause The cause code (see Exceptions for a list). Should be address exception.
      * @param addr  The address that caused the exception.
      */
-    public static void setRegisters(int cause, int pc, int addr) {
+    public static void setVADDR(int addr) {
         Coprocessor0.updateRegister(Coprocessor0.VADDR, addr);
-        setRegistersPC(cause, pc);
     }
 
 }  // Exceptions
