@@ -311,6 +311,7 @@ public class Simulator extends Observable {
             int pc = 0;  // added: 7/26/06 (explanation above)
 
             while (true) {
+                boolean exceptionOccurred = false;
                 try {
                     statement = Globals.memory.getStatement(RegisterFile.getProgramCounter());
                 } catch (AddressErrorException e) {
@@ -371,6 +372,7 @@ public class Simulator extends Observable {
                             } catch (AddressErrorException aee) {
                             } // will not occur with this well-known addres
                             if (exceptionHandler != null) {
+                                exceptionOccurred = true;
                                 RegisterFile.setProgramCounter(Memory.exceptionHandlerAddress);
                             } else {
                                 this.constructReturnReason = EXCEPTION;
@@ -384,20 +386,24 @@ public class Simulator extends Observable {
                     }
                 }// end synchronized block
 
-                ///////// DPS 15 June 2007.  Handle delayed branching if it occurs./////
-                if (DelayedBranch.isTriggered()) {
-                    int delayedBranchDest = DelayedBranch.getBranchTargetAddress();
-                    RegisterFile.setProgramCounter(delayedBranchDest);
+                if (!exceptionOccurred) {
+                    ///////// DPS 15 June 2007.  Handle delayed branching if it occurs./////
+                    if (DelayedBranch.isTriggered()) {
+                        int delayedBranchDest = DelayedBranch.getBranchTargetAddress();
+                        RegisterFile.setProgramCounter(delayedBranchDest);
+                        DelayedBranch.clear();
+                        if (Globals.getSettings().getBackSteppingEnabled()) {
+                            Globals.program.getBackStepper().addRearmDelayedBranch(pc, delayedBranchDest);
+                        }
+                    } else if (DelayedBranch.isRegistered()) {
+                        if (Globals.getSettings().getBackSteppingEnabled()) {
+                            Globals.program.getBackStepper().addUntriggerDelayedBranch(pc);
+                        }
+                        DelayedBranch.trigger();
+                    }//////////////////////////////////////////////////////////////////////
+                } else {
                     DelayedBranch.clear();
-                    if (Globals.getSettings().getBackSteppingEnabled()) {
-                        Globals.program.getBackStepper().addRearmDelayedBranch(pc, delayedBranchDest);
-                    }
-                } else if (DelayedBranch.isRegistered()) {
-                    if (Globals.getSettings().getBackSteppingEnabled()) {
-                        Globals.program.getBackStepper().addUntriggerDelayedBranch(pc);
-                    }
-                    DelayedBranch.trigger();
-                }//////////////////////////////////////////////////////////////////////
+                }
 
                 boolean tryagain;
                 do {
