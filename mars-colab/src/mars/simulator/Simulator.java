@@ -281,12 +281,7 @@ public class Simulator extends Observable {
             } catch (AddressErrorException e) {
                 ErrorList el = new ErrorList();
                 el.add(new ErrorMessage((MIPSprogram) null, 0, 0, "invalid program counter value: " + Binary.intToHexString(RegisterFile.getProgramCounter())));
-                this.pe = new ProcessingException(el, e);
-                // Next statement is a hack.  Previous statement sets EPC register to ProgramCounter-4
-                // because it assumes the bad address comes from an operand so the ProgramCounter has already been
-                // incremented.  In this case, bad address is the instruction fetch itself so Program Counter has
-                // not yet been incremented.  We'll set the EPC directly here.  DPS 8-July-2013
-                Coprocessor0.updateRegister(Coprocessor0.EPC, RegisterFile.getProgramCounter());
+                this.pe = new ProcessingException(el, e, RegisterFile.getProgramCounter());
                 this.constructReturnReason = EXCEPTION;
                 this.done = true;
                 SystemIO.resetFiles(); // close any files opened in MIPS program
@@ -450,12 +445,7 @@ public class Simulator extends Observable {
                 } catch (AddressErrorException e) {
                     ErrorList el = new ErrorList();
                     el.add(new ErrorMessage((MIPSprogram) null, 0, 0, "invalid program counter value: " + Binary.intToHexString(RegisterFile.getProgramCounter())));
-                    this.pe = new ProcessingException(el, e);
-                    // Next statement is a hack.  Previous statement sets EPC register to ProgramCounter-4
-                    // because it assumes the bad address comes from an operand so the ProgramCounter has already been
-                    // incremented.  In this case, bad address is the instruction fetch itself so Program Counter has
-                    // not yet been incremented.  We'll set the EPC directly here.  DPS 8-July-2013
-                    Coprocessor0.updateRegister(Coprocessor0.EPC, RegisterFile.getProgramCounter());
+                    this.pe = new ProcessingException(el, e, RegisterFile.getProgramCounter());
                     this.constructReturnReason = EXCEPTION;
                     this.done = true;
                     SystemIO.resetFiles(); // close any files opened in MIPS program

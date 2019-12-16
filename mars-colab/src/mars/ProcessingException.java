@@ -60,9 +60,9 @@ public class ProcessingException extends Exception {
      *            represents one processing error.
      * @param aee AddressErrorException object containing specialized error message, cause, address
      **/
-    public ProcessingException(ErrorList e, AddressErrorException aee) {
+    public ProcessingException(ErrorList e, AddressErrorException aee, int pc) {
         errs = e;
-        Exceptions.setRegisters(aee.getType(), aee.getAddress());
+        Exceptions.setRegisters(aee.getType(), pc, aee.getAddress());
     }
 
     /**
@@ -93,7 +93,7 @@ public class ProcessingException extends Exception {
      **/
     public ProcessingException(ProgramStatement ps, String m, int cause) {
         this(ps, m);
-        Exceptions.setRegisters(cause);
+        Exceptions.setRegistersPC(cause, ps.getAddress());
     }
 
 
@@ -106,7 +106,7 @@ public class ProcessingException extends Exception {
 
     public ProcessingException(ProgramStatement ps, AddressErrorException aee) {
         this(ps, aee.getMessage());
-        Exceptions.setRegisters(aee.getType(), aee.getAddress());
+        Exceptions.setRegisters(aee.getType(), ps.getAddress(), aee.getAddress());
     }
 
     /**
