@@ -122,7 +122,7 @@ public class DelayedBranch {
     *  Clear the delayed branch. This must be done immediately after setting the
 	 *  program counter to the target address.  This method has package visibility.
 	 */
-	 static void clear() {
+	 public static void clear() {
 //		 System.out.println("DB clear");
 	  state = CLEARED;
 	  branchTargetAddress = 0;

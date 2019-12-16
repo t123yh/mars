@@ -1,5 +1,6 @@
    package mars.venus;
    import mars.*;
+   import mars.simulator.DelayedBranch;
    import mars.util.*;
    import mars.mips.hardware.*;
    import java.util.*;
@@ -69,6 +70,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
          Component editPane = mainUI.getMainPane().getEditPane();
          ExecutePane executePane = mainUI.getMainPane().getExecutePane();
          RegistersPane registersPane = mainUI.getRegistersPane();
+         DelayedBranch.clear();
          extendedAssemblerEnabled = Globals.getSettings().getExtendedAssemblerEnabled();
          warningsAreErrors = Globals.getSettings().getWarningsAreErrors();
          if(FileStatus.getFile()!= null){

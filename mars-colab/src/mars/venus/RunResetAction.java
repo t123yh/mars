@@ -1,5 +1,6 @@
    package mars.venus;
    import mars.*;
+   import mars.simulator.DelayedBranch;
    import mars.util.*;
    import mars.mips.hardware.*;
    import java.awt.*;
@@ -74,6 +75,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
          Coprocessor1.resetRegisters();
          Coprocessor0.resetRegisters();
 
+           DelayedBranch.clear();
 			executePane.getRegistersWindow().clearHighlighting();
          executePane.getRegistersWindow().updateRegisters();
 			executePane.getCoprocessor1Window().clearHighlighting();
