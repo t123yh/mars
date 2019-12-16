@@ -6,6 +6,7 @@ import mars.Globals;
 import mars.assembler.SymbolTable;
 import mars.mips.instructions.Instruction;
 import mars.util.Binary;
+import mars.util.SystemIO;
 
 /*
 Copyright (c) 2003-2008,  Pete Sanderson and Kenneth Vollmar
@@ -116,6 +117,12 @@ public class RegisterFile {
             old = (Globals.getSettings().getBackSteppingEnabled())
                     ? Globals.program.getBackStepper().addRegisterFileRestore(num, lo.setValue(val))
                     : lo.setValue(val);
+        }
+
+        // modifed by prime21, 2018, 12
+        if (num < 32) {
+            String numStr = num < 10 ? " " + num : "" + num;
+            SystemIO.printString("@" + Binary.intToHexString(programCounter.getValue() - 4).substring(2) + ": " + "$" + numStr + " <= " + Binary.intToHexString(val).substring(2) + "\n");
         }
         return old;
     }

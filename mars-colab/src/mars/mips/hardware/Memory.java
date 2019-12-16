@@ -443,6 +443,11 @@ public class Memory extends Observable {
                     Exceptions.ADDRESS_EXCEPTION_STORE, address);
         }
         notifyAnyObservers(AccessNotice.WRITE, address, length, value);
+
+        // modified by prime21 2018
+        int newWord = getWord(address & 0xFFFFFFFC);
+        SystemIO.printString("@" + Binary.intToHexString(RegisterFile.getProgramCounter() - 4).substring(2) + ": " + "*" + Binary.intToHexString(address & 0xFFFFFFFC).substring(2) + " <= " + Binary.intToHexString(newWord).substring(2) + "\n");
+
         return oldValue;
     }
 
