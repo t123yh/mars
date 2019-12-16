@@ -276,18 +276,6 @@ public class Simulator extends Observable {
 
             RegisterFile.initializeProgramCounter(pc);
             ProgramStatement statement = null;
-            try {
-                statement = Globals.memory.getStatement(RegisterFile.getProgramCounter());
-            } catch (AddressErrorException e) {
-                ErrorList el = new ErrorList();
-                el.add(new ErrorMessage((MIPSprogram) null, 0, 0, "invalid program counter value: " + Binary.intToHexString(RegisterFile.getProgramCounter())));
-                this.pe = new ProcessingException(el, e, RegisterFile.getProgramCounter());
-                this.constructReturnReason = EXCEPTION;
-                this.done = true;
-                SystemIO.resetFiles(); // close any files opened in MIPS program
-                Simulator.getInstance().notifyObserversOfExecutionStop(maxSteps, pc);
-                return new Boolean(done);
-            }
             int steps = 0;
 
             // *******************  PS addition 26 July 2006  **********************
@@ -322,7 +310,22 @@ public class Simulator extends Observable {
 
             int pc = 0;  // added: 7/26/06 (explanation above)
 
-            while (statement != null) {
+            while (true) {
+                try {
+                    statement = Globals.memory.getStatement(RegisterFile.getProgramCounter());
+                } catch (AddressErrorException e) {
+                    ErrorList el = new ErrorList();
+                    el.add(new ErrorMessage((MIPSprogram) null, 0, 0, "invalid program counter value: " + Binary.intToHexString(RegisterFile.getProgramCounter())));
+                    ProcessingException pe = new ProcessingException(el, e, RegisterFile.getProgramCounter());
+                    this.constructReturnReason = EXCEPTION;
+                    this.pe = pe;
+                    this.done = true;
+                    SystemIO.resetFiles(); // close any files opened in MIPS program
+                    Simulator.getInstance().notifyObserversOfExecutionStop(maxSteps, pc);
+                    return new Boolean(done);
+                }
+                if (statement == null)
+                    break;
                 pc = RegisterFile.getProgramCounter(); // added: 7/26/06 (explanation above)
                 RegisterFile.incrementPC();
                 // Perform the MIPS instruction in synchronized block.  If external threads agree
@@ -392,6 +395,34 @@ public class Simulator extends Observable {
                     DelayedBranch.trigger();
                 }//////////////////////////////////////////////////////////////////////
 
+                boolean tryagain;
+                do {
+                    tryagain = false;
+                    try {
+                        Globals.memory.getStatement(RegisterFile.getProgramCounter());
+                    } catch (AddressErrorException e) {
+                        ErrorList el = new ErrorList();
+                        el.add(new ErrorMessage((MIPSprogram) null, 0, 0, "invalid program counter value: " + Binary.intToHexString(RegisterFile.getProgramCounter())));
+                        ProcessingException pe = new ProcessingException(el, e, RegisterFile.getProgramCounter());
+                        ProgramStatement exceptionHandler = null;
+                        try {
+                            exceptionHandler = Globals.memory.getStatement(Memory.exceptionHandlerAddress);
+                        } catch (AddressErrorException aee) {
+                        } // will not occur with this well-known addres
+                        if (exceptionHandler != null) {
+                            RegisterFile.setProgramCounter(Memory.exceptionHandlerAddress);
+                            tryagain = true;
+                        } else {
+                            this.constructReturnReason = EXCEPTION;
+                            this.pe = pe;
+                            this.done = true;
+                            SystemIO.resetFiles(); // close any files opened in MIPS program
+                            Simulator.getInstance().notifyObserversOfExecutionStop(maxSteps, pc);
+                            return new Boolean(done);
+                        }
+                    }
+                } while (tryagain);
+
                 // Volatile variable initialized false but can be set true by the main thread.
                 // Used to stop or pause a running MIPS program.  See stopSimulation() above.
                 if (stop == true) {
@@ -440,18 +471,6 @@ public class Simulator extends Observable {
 
                 // Get next instruction in preparation for next iteration.
 
-                try {
-                    statement = Globals.memory.getStatement(RegisterFile.getProgramCounter());
-                } catch (AddressErrorException e) {
-                    ErrorList el = new ErrorList();
-                    el.add(new ErrorMessage((MIPSprogram) null, 0, 0, "invalid program counter value: " + Binary.intToHexString(RegisterFile.getProgramCounter())));
-                    this.pe = new ProcessingException(el, e, RegisterFile.getProgramCounter());
-                    this.constructReturnReason = EXCEPTION;
-                    this.done = true;
-                    SystemIO.resetFiles(); // close any files opened in MIPS program
-                    Simulator.getInstance().notifyObserversOfExecutionStop(maxSteps, pc);
-                    return new Boolean(done);
-                }
             }
             // DPS July 2007.  This "if" statement is needed for correct program
             // termination if delayed branching on and last statement in
