@@ -157,7 +157,7 @@ public class LuaBinding extends TwoArgFunction {
         @Override
         public LuaValue call(LuaValue lvOffset) {
             int offset = lvOffset.checkint();
-            InstructionSet.processBranch(offset, -1);
+            InstructionSet.processBranch(true, offset, -1);
             return LuaValue.NIL;
         }
     }
